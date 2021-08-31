@@ -150,7 +150,29 @@ const Diary = () => {
       setNotificationType("success");
       setName("");
       setNumbers("");
+    })
+    .catch(error => {
+      
+        setErrorMessage(error.response.data.error)
     });
+    // const personObject ={
+    //   name: inputName,
+    //   number: numbers,
+    // };
+    // personService.create(personObject).then((response) => {
+    //   setTimeout(() => {
+    //     setErrorMessage("")
+    //   }, 2000);
+    //   setPersons(persons.concat(response.data));
+    //   setErrorMessage(`${inputName} added`);
+    //   setNotificationType("success");
+    //   setName("");
+    //   setNumbers("");
+    // })
+    // .catch(error => {
+    //   setErrorMessage(`${error.response.data.error}`);
+    //   setNotificationType('error');
+    // })
   };
   const filteredPersons = filterName
     ? persons.filter(
