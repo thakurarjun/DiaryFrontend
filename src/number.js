@@ -1,6 +1,6 @@
 
 const axios = require("axios");
-const personUrl = "http://localhost:3002/api/phonebook";
+const personUrl = "https://phonebook-deploy.herokuapp.com/api/phonebook";
 const getPersons = () => {
   return axios.get(personUrl) 
  };
