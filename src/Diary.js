@@ -1,63 +1,17 @@
 import React from "react";
 import { useState, useEffect } from "react";
+import Typography from "@mui/material/Typography";
+import Button from "@mui/material/Button";
+import TextField from "@mui/material/TextField";
+import Box from "@mui/material/Box";
 import numbersService from "./number";
 import loginService from "../src/login";
 import Togglable from "./models/Togel";
 import LoginForm from "./models/LoginForm";
-const Person = ({ persons, onDeletePersons }) => {
-  return (
-    <ul>
-      {persons.name} {persons.number}
-      <button onClick={() => onDeletePersons(persons.id, persons.name)}>
-        delete
-      </button>
-    </ul>
-  );
-};
-const PersonForm = ({
-  addPerson,
-  onChangeName,
-  onChangeNumbers,
-  name,
-  number,
-}) => {
-  return (
-    <form onSubmit={addPerson}>
-      <div>
-        name: <input required value={name} onChange={onChangeName} />
-      </div>
-      <div>
-        number: <input required value={number} onChange={onChangeNumbers} />
-      </div>
-      <div>
-        <button type="submit">Add</button>
-      </div>
-    </form>
-  );
-};
-const Persons = ({ persons, onDeletePersons }) => {
-  return (
-    <ul>
-      {persons.map((person) => (
-        <Person persons={person} onDeletePersons={onDeletePersons} />
-      ))}
-    </ul>
-  );
-};
-const Filter = ({ filterName, onChangeFilter }) => {
-  return (
-    <>
-      filter shown with:
-      <input value={filterName} onChange={onChangeFilter} />
-    </>
-  );
-};
-const Notification = ({ message, type }) => {
-  if (message === "") {
-    return <div></div>;
-  }
-  return <div className={type}>{message}</div>;
-};
+import Persons from "./models/Persons";
+import PersonForm from "./models/PersonForm";
+import Notification from "./models/Notification";
+import Filter from "./models/Filter";
 const Diary = () => {
   const [persons, setPersons] = useState([]);
   const [inputName, setName] = useState("");
@@ -74,8 +28,7 @@ const Diary = () => {
       setPersons(response.data);
     });
   }, []);
-
-  useEffect(() => {
+ useEffect(() => {
     const loggedUserToken = window.localStorage.getItem(
       "loggedPhonebookappUser"
     );
@@ -118,8 +71,7 @@ const Diary = () => {
         });
     }
   };
-
-  const addPerson = (event) => {
+const addPerson = (event) => {
     event.preventDefault();
     let personfound = persons.filter(
       (person) => person.name.toLowerCase() === inputName.toLocaleLowerCase()
@@ -156,8 +108,7 @@ const Diary = () => {
       name: inputName,
       number: numbers,
     };
-
-    numbersService
+numbersService
       .create(newContact)
       .then((response) => {
         setTimeout(() => {
@@ -202,26 +153,24 @@ const Diary = () => {
       }, 5000);
     }
   };
-
-  const loginForm = () => {
+const loginForm = () => {
     return (
-            <Togglable buttonLabel='Log In'>
-            <LoginForm
-              username={username}
-              password={password}
-              handleUsernameChange={({ target }) => setUsername(target.value)}
-              handlePasswordChange={({ target }) => setPassword(target.value)}
-              handleSubmit={handleLogin}
-            ></LoginForm>
-          </Togglable>
+      <Togglable buttonLabel="Log In">
+        <LoginForm
+          username={username}
+          password={password}
+          handleUsernameChange={({ target }) => setUsername(target.value)}
+          handlePasswordChange={({ target }) => setPassword(target.value)}
+          handleSubmit={handleLogin}
+        ></LoginForm>
+      </Togglable>
     );
   };
-
-  const phoneBookForm = () => (
+const phoneBookForm = () => {
+    return(
     <>
-      <h2>Filter</h2>
-      <Filter filterName={filterName} onChangeFilter={onChangeFilter} />
-      <h2>Phonebook</h2>
+      <Filter filterName={filterName} onChangeFilter={onChangeFilter}></Filter>
+      <Typography variant="h5">Phonebook</Typography>
 
       <PersonForm
         addPerson={addPerson}
@@ -230,25 +179,36 @@ const Diary = () => {
         name={inputName}
         number={numbers}
       />
-
-      <h2>Numbers</h2>
+ <Typography variant="h5">Numbers</Typography>
       <Persons persons={filteredPersons} onDeletePersons={onDeletePersons} />
-    </>
-  );
-
-  return (
+    </> 
+    )};
+return (
     <div className="container" align="center">
       <Notification message={errorMessage} type={notificationType} />
-      {user === null ? (
-        loginForm()
-      ) : (
-        <div>
-          <p> {user.name} logged in</p>
-          {phoneBookForm()}
-        </div>
-      )}
+      <Box
+        sx={{
+          width: 600,
+          height: 800,
+          border: "1px solid grey",
+          borderRadius: 1,
+          bgcolor:'#f7f7f7'
+        }}
+        display="flex"
+        justifyContent="center"
+        alignItems="center"
+        minHeight="70vh"
+      >
+{user === null ? (
+          loginForm()
+        ) : (
+          <div>
+            <Typography variant="h5">{user.name} logged in</Typography>
+            {phoneBookForm()}
+          </div>
+        )}
+      </Box>
     </div>
   );
 };
-
 export default Diary;
