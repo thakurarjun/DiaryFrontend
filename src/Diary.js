@@ -1,8 +1,6 @@
 import React from "react";
 import { useState, useEffect } from "react";
 import Typography from "@mui/material/Typography";
-import Button from "@mui/material/Button";
-import TextField from "@mui/material/TextField";
 import Box from "@mui/material/Box";
 import numbersService from "./number";
 import loginService from "../src/login";
@@ -14,8 +12,6 @@ import Notification from "./models/Notification";
 import Filter from "./models/Filter";
 const Diary = () => {
   const [persons, setPersons] = useState([]);
-  const [inputName, setName] = useState("");
-  const [numbers, setNumbers] = useState("");
   const [filterName, setFilter] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
   const [notificationType, setNotificationType] = useState("success");
@@ -23,12 +19,13 @@ const Diary = () => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [user, setUser] = useState(null);
+
   useEffect(() => {
     numbersService.getPersons().then((response) => {
       setPersons(response.data);
     });
   }, []);
- useEffect(() => {
+  useEffect(() => {
     const loggedUserToken = window.localStorage.getItem(
       "loggedPhonebookappUser"
     );
@@ -38,12 +35,7 @@ const Diary = () => {
       numbersService.setToken(user.token);
     }
   }, []);
-  const onChangeNumbers = (event) => {
-    setNumbers(event.target.value);
-  };
-  const onChangeName = (event) => {
-    setName(event.target.value);
-  };
+
   const onChangeFilter = (event) => {
     setFilter(event.target.value);
   };
@@ -57,37 +49,33 @@ const Diary = () => {
             setErrorMessage("");
           }, 5000);
           setPersons(persons.filter((person) => person.id !== id));
-          setErrorMessage(`${inputName} deleted`);
+          //setErrorMessage(`${inputName} deleted`);
 
           setNotificationType("error");
-          setName("");
-          setNumbers("");
+          //setName("");
+          // setNumbers("");
         })
         .catch((error) => {
-          alert(
-            `information of '${inputName} has already been removed from server`
-          );
+          // alert(
+          //   `information of '${inputName} has already been removed from server`
+          // );
           setNotificationType(notificationType.filter((n) => n.id !== id));
         });
     }
   };
-const addPerson = (event) => {
-    event.preventDefault();
+  const addPerson = (newNumber) => {
     let personfound = persons.filter(
-      (person) => person.name.toLowerCase() === inputName.toLocaleLowerCase()
+      (person) =>
+        person.name.toLowerCase() === newNumber.name.toLocaleLowerCase()
     );
     if (personfound.length > 0) {
       if (
         window.confirm(
-          `${inputName} already exists in phonebook. Do you want to replace the old no with a new one?`
+          `${newNumber.name} already exists in phonebook. Do you want to replace the old no with a new one?`
         )
       ) {
-        let updatedContact = {
-          name: inputName,
-          number: numbers,
-        };
         numbersService
-          .updatePersons(personfound[0].id, updatedContact)
+          .updatePersons(personfound[0].id, newNumber)
           .then((returnedContact) => {
             setPersons(
               persons.map((p) =>
@@ -96,29 +84,21 @@ const addPerson = (event) => {
                   : p
               )
             );
-            setErrorMessage(`${inputName} updated`);
+            setErrorMessage(`${newNumber.name} updated`);
             setNotificationType("success");
-            setName("");
-            setNumbers("");
           });
       }
       return;
     }
-    const newContact = {
-      name: inputName,
-      number: numbers,
-    };
-numbersService
-      .create(newContact)
+    numbersService
+      .create(newNumber)
       .then((response) => {
         setTimeout(() => {
           setErrorMessage("");
         }, 5000);
         setPersons(persons.concat(response));
-        setErrorMessage(`${inputName} added`);
+        setErrorMessage(`${newNumber.name} added`);
         setNotificationType("success");
-        setName("");
-        setNumbers("");
       })
       .catch((error) => {
         setErrorMessage(error.response.data.error);
@@ -153,7 +133,7 @@ numbersService
       }, 5000);
     }
   };
-const loginForm = () => {
+  const loginForm = () => {
     return (
       <Togglable buttonLabel="Log In">
         <LoginForm
@@ -166,24 +146,22 @@ const loginForm = () => {
       </Togglable>
     );
   };
-const phoneBookForm = () => {
-    return(
-    <>
-      <Filter filterName={filterName} onChangeFilter={onChangeFilter}></Filter>
-      <Typography variant="h5">Phonebook</Typography>
+  const phoneBookForm = () => {
+    return (
+      <>
+        <Filter
+          filterName={filterName}
+          onChangeFilter={onChangeFilter}
+        ></Filter>
+        <Typography variant="h5">Phonebook</Typography>
 
-      <PersonForm
-        addPerson={addPerson}
-        onChangeName={onChangeName}
-        onChangeNumbers={onChangeNumbers}
-        name={inputName}
-        number={numbers}
-      />
- <Typography variant="h5">Numbers</Typography>
-      <Persons persons={filteredPersons} onDeletePersons={onDeletePersons} />
-    </> 
-    )};
-return (
+        <PersonForm addPerson={addPerson} />
+        <Typography variant="h5">Numbers</Typography>
+        <Persons persons={filteredPersons} onDeletePersons={onDeletePersons} />
+      </>
+    );
+  };
+  return (
     <div className="container" align="center">
       <Notification message={errorMessage} type={notificationType} />
       <Box
@@ -192,14 +170,14 @@ return (
           height: 800,
           border: "1px solid grey",
           borderRadius: 1,
-          bgcolor:'#f7f7f7'
+          bgcolor: "#f7f7f7",
         }}
         display="flex"
         justifyContent="center"
         alignItems="center"
         minHeight="70vh"
       >
-{user === null ? (
+        {user === null ? (
           loginForm()
         ) : (
           <div>

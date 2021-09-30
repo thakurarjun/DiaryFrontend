@@ -1,24 +1,34 @@
-import React from "react";
-import Typography from "@mui/material/Typography";
+import React ,{useState} from "react";
 import TextField from "@mui/material/TextField";
 import Button from "@mui/material/Button";
 import Box from "@mui/material/Box";
-const PersonForm = ({
-  addPerson,
-  onChangeName,
-  onChangeNumbers,
-  name,
-  number,
-}) => {
+const PersonForm = ({ addPerson }) => {
+  const [inputName, setName] = useState("");
+  const [numbers, setNumbers] = useState("");
+  const onChangeNumbers = (event) => {
+    setNumbers(event.target.value);
+  };
+  const onChangeName = (event) => {
+    setName(event.target.value);
+  };
+   const addNewNumber = (event) => {
+    event.preventDefault()
+    addPerson({
+        name : inputName,
+        number: numbers
+    })
+    setName("");
+    setNumbers("");
+  };
   return (
-    <form onSubmit={addPerson}>
+    <form onSubmit={addNewNumber}>
       <Box
         sx={{
           width: "400",
           height: "300",
           border: "1px solid black",
           borderRadius: 2,
-          bgcolor:'#f5fffa'
+          bgcolor: "#f5fffa",
         }}
         display="grid"
         justifyContent="center"
@@ -33,7 +43,7 @@ const PersonForm = ({
           onChange={onChangeName}
           input
           required
-          value={name}
+          value={inputName}
         />
 
         <TextField
@@ -44,7 +54,7 @@ const PersonForm = ({
           onChange={onChangeNumbers}
           input
           required
-          value={number}
+          value={numbers}
         />
 
         <div>
